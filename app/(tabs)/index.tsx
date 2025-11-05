@@ -1,146 +1,187 @@
-import React, { useEffect, useState } from 'react';
-import { FlatList, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
+import { FlatList, Image, StyleSheet, TouchableOpacity, View, Alert } from "react-native";
+import axios from "axios";
 import { useRouter } from 'expo-router';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
-type Product = {
-  id: string;      
+type userCreated={
+  id: string;
+  name: string;
+  avatar: string;
+};
+type NewItem = {
+  id: string;
   title: string;
-  price: number;  
-  image: string;
+  userName: string,
+  user_created: userCreated
+  avatar: userCreated;
+  created_at: string;
+  content: string;
+  likes?: number;
+  comments?: number;
 };
 
-export default function HomeScreen() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
-  
-  
+
+export default function NewsFeedScreen(){
+    const[news, setNews] = useState<NewItem[]>([]);
+    const[loading, setLoading] = useState(true);
+    const router = useRouter();
+
     useEffect(() => {
-      const fetchProducts = async () => {
-        try {
-          const res = await fetch('https://fakestoreapi.com/products');
-          const data = await res.json();
-          setProducts(data);
-        } catch (error) {
-          console.error('Lỗi khi tải sản phẩm:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchProducts();
-    }, []);
-  
-    if (loading) {
-      return (
-        <ThemedView style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#1E90FF" />
+    const fetchNews = async () => {
+      try {
+        const token = await AsyncStorage.getItem("access_token");
+       if (!token) {
+        Alert.alert(
+          "Thông báo",
+          "Vui lòng đăng nhập trước khi xem News Feed",
+          [
+            {
+              text: "OK",
+              onPress: () => router.push('/login'),
+            },
+          ]
+        );
+        setLoading(false);
+        return;
+      }
+
+        const res = await axios.get(
+          "https://beta.api.gateway.overate-vntech.com/api/v1/kaizen/news-feed",
+          {
+            params: {
+              type: 1,
+              page: 1,
+              limit: 50,
+            },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "x-svc-id": 1153,
+            },
+          }
+        );
+
+        console.log("Dữ liệu API:", res.data);
+        const newsList = res.data?.data?.list || [];
+        setNews(newsList);
+
+        // setNews(items || []);
+      } catch (error: any) {
+        console.error("Lỗi khi gọi API:", error.response?.data || error.message);
+        Alert.alert("Lỗi", "Không thể tải dữ liệu News Feed");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNews();
+  }, []);
+
+    const renderItem = ({ item }: { item: NewItem }) => {
+        return (
+            <ThemedView style={styles.card}>
+            <View style={styles.header}>
+                {item.avatar ? (
+                <Image source={{ uri: item.user_created.avatar}} style={styles.avatar} />
+                ) : (
+                <View style={[styles.avatar, styles.avatarPlaceholder]} />
+                )}
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                <ThemedText style={styles.userName}>{item.user_created.name}</ThemedText>
+                <ThemedText style={styles.time}>{item.created_at}</ThemedText>
+                </View>
+            </View>
+             <ThemedText style={styles.userName}>{item.title}</ThemedText>
+            <ThemedText style={styles.content}>{item.content}</ThemedText>
+            <View style={styles.acctionRow}>
+                    <TouchableOpacity style={styles.actionButton}>
+                        <Ionicons name='heart-outline' color='#FF5C5C'/>
+                        <ThemedText style={styles.actionText}>{item.likes ?? 0}</ThemedText>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionButton}>
+                        <Ionicons name='chatbubbles-outline' color='#555'></Ionicons>
+                        <ThemedText style={styles.actionText}>{item.comments ?? 0}</ThemedText>
+                    </TouchableOpacity>
+                </View>
+
+            </ThemedView>
+        );
+    };
+
+    return(
+        <ThemedView>
+            <FlatList
+                data={news}
+                keyExtractor={(item) => item.id}
+                renderItem={renderItem}
+                contentContainerStyle={{}}
+            />
         </ThemedView>
-      );
+    );
+
+}
+const styles = StyleSheet.create({
+    container:{
+        flex: 1,
+        backgroundColor: '#fff'
+    },
+    card:{
+        top:30,
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        padding: 12,
+        marginBottom: 12,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowOffset: {width:0, height: 2},
+        shadowRadius: 4,
+        elevation: 2
+    },
+    header:{
+        flexDirection:'row',
+        alignItems: 'center',
+        marginBottom: 8
+    },
+    avatar:{
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: '#ccc'
+    },
+    avatarPlaceholder:{
+        backgroundColor: '#bbb'
+    },
+    userName:{
+        fontWeight:'700',
+        fontSize: 14
+    },
+    time:{
+        fontSize: 12,
+        color: '#555'
+    },
+    content:{
+        fontSize: 12,
+        color: '#333'
+    },
+    acctionRow:{
+        flexDirection: "row",
+        borderTopWidth: 0.5,
+        borderTopColor: "#eee",
+        paddingTop: 6,
+        justifyContent: "flex-start",
+    },
+    actionButton:{
+        flexDirection: "row",
+        alignItems: "center",
+        marginRight: 16
+    },
+    actionText:{
+        fontSize: 13,
+        marginLeft: 4,
+        color: '#555'
     }
 
-  const renderItem = ({ item }: { item: Product }) => (
-    <TouchableOpacity
-      style={styles.card}
-      // onPress={() => router.push(`/productDetail/${item.id}`)} 
-      // onPress={() => router.push(`/product/123` as any)}
-      onPress={() => router.push({
-        pathname: '/productDetail',
-        params: {id: item.id}
-      })}
-
-    >
-      <Image source={{ uri: item.image }} style={styles.image} />
-      <ThemedText type="defaultSemiBold" style={styles.name}>
-        {item.title}
-      </ThemedText>
-      <ThemedText style={styles.price}>
-        {item.price.toLocaleString('vi-VN')}₫
-      </ThemedText>
-    </TouchableOpacity>
-  );
-
-  return (
-
-    
-    <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.header}>
-        Sản phẩm nổi bật
-      </ThemedText>
-      <FlatList
-        data={products}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        columnWrapperStyle={{ justifyContent: 'space-between' }}
-        contentContainerStyle={{ paddingBottom: 50 }}
-      />
-      {/* <TouchableOpacity style={styles.button} onPress={() => router.push('/(tabs)/newFeed')}>
-           <ThemedText style={styles.buttonText}>new feed</ThemedText>
-      </TouchableOpacity> */}
-    </ThemedView>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    padding: 16,
-  },
-  header: {
-    top:15,
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  card: {
-    backgroundColor: '#f9f9f9',
-    borderRadius: 12,
-    padding: 10,
-    width: '45%', 
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  image: {
-    width: '100%',
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 8,
-  },
-  name: {
-    fontSize: 14,
-    marginBottom: 4,
-    color: '#333',
-  },
-  price: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1E90FF',
-  },
-   button: {
-    backgroundColor: '#1E90FF',
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-   loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  
-
-});
+})

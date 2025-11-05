@@ -220,11 +220,13 @@
 import React, { useEffect, useState } from 'react';
 import { View, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
+import { Text, TextProps } from 'react-native';
 import { ThemedView } from '@/components/themed-view';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
+import Toast from 'react-native-toast-message';
 
 type User = {
   id: string;
@@ -295,26 +297,38 @@ export default function PersonScreen() {
       await AsyncStorage.removeItem('user_info');
       await AsyncStorage.removeItem('user_id');
       setUser(null);
-      Alert.alert('Thông báo', 'Bạn đã đăng xuất!');
+      Toast.show({
+        type: 'success',
+        text1: 'Thông báo',
+        text2: 'Đăng xuất thành công',
+        visibilityTime: 2000
+      })
+      // Alert.alert('Thông báo', 'Bạn đã đăng xuất!');
     } catch (error) {
       console.log(error);
-      Alert.alert('Lỗi', 'Đăng xuất thất bại!');
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Đăng xuất thất bại',
+        visibilityTime: 2000
+      })
+      // Alert.alert('Lỗi', 'Đăng xuất thất bại!');
     }
   };
 
-  const handleGoToLogin = () => router.push('/login');
-  const handleGoToRegister = () => router.push('/register');
+  const handleGoToLogin = () => router.replace('/login');
+  // const handleGoToRegister = () => router.push('/register');
 
   if (loading) {
     return (
-      <ThemedView style={styles.container}>
-        <ThemedText>Đang tải...</ThemedText>
-      </ThemedView>
+      <View style={styles.container}>
+        <Text>Đang tải...</Text>
+      </View>
     );
   }
 
   return (
-    <ThemedView style={styles.container}>
+    <View style={styles.container}>
       <ThemedText type="title" style={styles.title}>
         {user ? 'Thông tin người dùng' : 'Chào mừng bạn!'}
       </ThemedText>
@@ -327,48 +341,107 @@ export default function PersonScreen() {
               style={styles.avatar}
             />
             <View style={styles.info}>
-              <ThemedText style={styles.name}>{user.name}</ThemedText>
+              <Text style={styles.name}>{user.name}</Text>
               <View style={styles.row}>
                 <Ionicons name="briefcase-outline" size={18} color="#555" />
-                <ThemedText style={styles.text}>{user.departments || 'Không có phòng ban'}</ThemedText>
+                <Text style={styles.text}>{user.departments || 'Không có phòng ban'}</Text>
               </View>
             </View>
           </View>
 
           <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={handleLogout}>
-            <ThemedText style={styles.buttonText}>Đăng xuất</ThemedText>
+            <Text style={styles.buttonText}>Đăng xuất</Text>
           </TouchableOpacity>
         </>
       ) : (
         <View style={styles.buttonRow}>
           <TouchableOpacity style={[styles.button, styles.loginButton]} onPress={handleGoToLogin}>
-            <ThemedText style={styles.buttonText}>Đăng nhập</ThemedText>
+            <Text style={styles.buttonText}>Đăng nhập</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.button, styles.registerButton]} onPress={handleGoToRegister}>
+          {/* <TouchableOpacity style={[styles.button, styles.registerButton]} onPress={handleGoToRegister}>
             <ThemedText style={styles.buttonText}>Đăng ký</ThemedText>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       )}
-    </ThemedView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: '#fff' },
-  title: { fontSize: 22, fontWeight: '700', marginBottom: 20 },
-  card: { width: '100%', flexDirection: 'row', alignItems: 'center', backgroundColor: '#f9f9f9', borderRadius: 16, padding: 16, marginBottom: 30, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 5, elevation: 3 },
-  avatar: { width: 70, height: 70, borderRadius: 35, marginRight: 16 },
-  info: { flex: 1 },
-  name: { fontWeight: '700', fontSize: 18, marginBottom: 6 },
-  row: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
-  text: { marginLeft: 6, color: '#555' },
-  buttonRow: { flexDirection: 'row', gap: 10 },
-  button: { paddingVertical: 14, paddingHorizontal: 30, borderRadius: 12 },
-  loginButton: { backgroundColor: '#1E90FF' },
-  registerButton: { backgroundColor: '#ce113a' },
-  logoutButton: { marginTop: 30, backgroundColor: '#000' },
-  buttonText: { color: '#fff', fontWeight: '600' },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+    backgroundColor: '#fff',
+  },
+  title: {
+    marginBottom: 20,
+    fontSize: 22,
+    fontWeight: '700',
+  },
+  card: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f9f9f9',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 30,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  avatar: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    marginRight: 16,
+  },
+  info: {
+    flex: 1,
+  },
+  name: {
+    fontWeight: '700',
+    fontSize: 18,
+    marginBottom: 6,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  text: {
+    marginLeft: 6,
+    color: '#555',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+  },
+  button: {
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+    borderRadius: 12,
+  },
+  loginButton: {
+    backgroundColor: '#1E90FF',
+  },
+  registerButton: {
+    backgroundColor: '#ce113a',
+  },
+  logoutButton: {
+    marginTop: 30,
+    backgroundColor: '#000',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
 });
 
 

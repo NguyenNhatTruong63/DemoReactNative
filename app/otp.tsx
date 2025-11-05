@@ -118,6 +118,7 @@ import { OtpInput } from 'react-native-otp-entry';
 import axios from 'axios';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 
 export default function OtpScreen() {
   const [otp, setOtp] = useState('');
@@ -126,7 +127,13 @@ export default function OtpScreen() {
 
   const handleVerifyOtp = async () => {
     if (!otp) {
-      Alert.alert('Thông báo', 'Vui lòng nhập mã OTP');
+      Toast.show({
+        type: 'error',
+        text1: 'Thông báo',
+        text2: 'Vui lòng nhập mã OTP',
+        visibilityTime: 3000,
+      })
+      // Alert.alert('Thông báo', 'Vui lòng nhập mã OTP');
       return;
     }
 
@@ -160,16 +167,38 @@ export default function OtpScreen() {
           console.log('Đã lưu thông tin user:', userInfo);
           console.log('Đã lưu user_id:', userInfo.id);
         }
-
-        Alert.alert('Xác thực thành công', 'Đăng nhập hoàn tất!', [
-          { text: 'OK', onPress: () => router.push('/person') },
-        ]);
+        Toast.show({
+          type: 'success',
+          text1: 'Xác thực thành công',
+          text2: 'Đăng nhập hoàn tất',
+          visibilityTime: 2000,
+          onHide:() =>{
+            router.push({
+              pathname: '/'
+            })
+          }
+        })
+        // Alert.alert('Xác thực thành công', 'Đăng nhập hoàn tất!', [
+        //   { text: 'OK', onPress: () => router.push('/') },
+        // ]);
       } else {
-        Alert.alert('Lỗi', res.data?.message || 'OTP không chính xác');
+        Toast.show({
+          type: 'error',
+          text1: 'Lỗi',
+          text2: res.data?.message || 'OTP không chính xác',
+          visibilityTime: 2000,
+        })
+        // Alert.alert('Lỗi', res.data?.message || 'OTP không chính xác');
       }
     } catch (error: any) {
-      const msg = error.response?.data?.message || 'OTP không chính xác hoặc hết hạn';
-      Alert.alert('Xác thực thất bại', msg);
+      // const msg = error.response?.data?.message || 'OTP không chính xác hoặc hết hạn';
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: error.response?.data?.message || 'OTP không chính xác hoặc hết hạn',
+        visibilityTime: 2000
+      })
+      // Alert.alert('Xác thực thất bại', msg);
       console.log('Lỗi OTP:', error.response?.data || error.message);
     }
   };
