@@ -6,6 +6,7 @@ import { FlatList, Image, StyleSheet, TouchableOpacity, View, Alert } from "reac
 import axios from "axios";
 import { useRouter } from 'expo-router';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
 
 type userCreated={
   id: string;
@@ -35,16 +36,22 @@ export default function NewsFeedScreen(){
       try {
         const token = await AsyncStorage.getItem("access_token");
        if (!token) {
-        Alert.alert(
-          "Thông báo",
-          "Vui lòng đăng nhập trước khi xem News Feed",
-          [
-            {
-              text: "OK",
-              onPress: () => router.push('/login'),
-            },
-          ]
-        );
+        Toast.show({
+          type: 'error',
+          text1: 'Thông báo',
+          text2: 'Vui lòng đăng nhập trước khi xem News Feed',
+          visibilityTime: 2000
+        })
+        // Alert.alert(
+        //   "Thông báo",
+        //   "Vui lòng đăng nhập trước khi xem News Feed",
+        //   [
+        //     {
+        //       text: "OK",
+        //       onPress: () => router.push('/login'),
+        //     },
+        //   ]
+        // );
         setLoading(false);
         return;
       }
@@ -71,7 +78,13 @@ export default function NewsFeedScreen(){
         // setNews(items || []);
       } catch (error: any) {
         console.error("Lỗi khi gọi API:", error.response?.data || error.message);
-        Alert.alert("Lỗi", "Không thể tải dữ liệu News Feed");
+        Toast.show({
+          type: 'error',
+          text1: 'Lỗi',
+          text2: 'Không thể tải dữ liệu News Feed',
+          visibilityTime: 2000
+        })
+        // Alert.alert("Lỗi", "Không thể tải dữ liệu News Feed");
       } finally {
         setLoading(false);
       }
