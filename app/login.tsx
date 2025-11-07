@@ -179,9 +179,13 @@ const handleLogin = async () => {
         onPress={handleLogin}
         disabled={!(isUserValidate && isPassValidate)}
       > */}
+       <TouchableOpacity onPress={() => router.push("/forgotPassword")}>
+        <Text style={styles.buttonText}>Quên mật khẩu</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Đăng nhập</Text>
       </TouchableOpacity>  
+     
     </View>
   );
 

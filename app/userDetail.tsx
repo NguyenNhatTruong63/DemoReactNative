@@ -4,6 +4,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import Toast from "react-native-toast-message";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useFocusEffect } from "expo-router";
+
 
 export default function UserDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -32,6 +34,7 @@ export default function UserDetailScreen() {
     const [dd, mm, yyyy] = d.split("/");
     return `${String(dd).padStart(2, "0")}/${Number(mm)}/${yyyy}`;
   };
+  
 
   useEffect(() => {
     const loadDetail = async () => {
@@ -82,6 +85,8 @@ export default function UserDetailScreen() {
     };
     loadDetail();
   }, [id]);
+  
+  
 
   const avatarUrl = avatar
     ? `${resourceUrl}/${avatar}`

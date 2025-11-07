@@ -52,7 +52,8 @@ export default function PersonScreen() {
     try {
       const token = await AsyncStorage.getItem('access_token');
       if (!token) {
-        setUser(null);
+        setLoading(false);
+        // setUser(null);
         return;
       }
 
