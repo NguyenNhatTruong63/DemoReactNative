@@ -1,232 +1,10 @@
-// import { ThemedText } from '@/components/themed-text';
-// import { ThemedView } from '@/components/themed-view';
-// import { Ionicons } from '@expo/vector-icons';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-// import { useRouter } from 'expo-router';
-// import axios from "axios";
-// import React, { useEffect, useState } from "react";
-// import { Alert, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
-
-// type User = {
-//   name: string;
-//   departments: string;
-//   avatar: string;
-// };
-
-// export default function PersonScreen() {
-//   const router = useRouter();
-//   const [user, setUser] = useState(null);
-
-//   // const user = {
-//   //   name: 'Nguyễn Văn A',
-//   //   departments: 'IT',
-//   //   avatar: 'https://jbagy.me/wp-content/uploads/2025/03/anh-avatar-vo-tri-meo-3.jpg',
-//   // };
-
-//   useEffect(() => {
-//   const fetchUser = async () => {
-//     try {
-//       const token = await AsyncStorage.getItem("access_token");
-
-//       if (!token) {
-//         Alert.alert("Thông báo", "Bạn chưa đăng nhập!");
-//         setUser(null);
-//         return;
-//       }
-
-//       // Gọi API lấy thông tin người dùng
-//       const res = await axios.get(
-//         "https://beta.api.gateway.overate-vntech.com//api/v1/users/<id>/detail?id=<id>",
-//         {
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//             "x-svc-id": 1153,
-//           },
-//         }
-//       );
-
-//       console.log("Thông tin user:", res.data);
-
-//       // Kiểm tra dữ liệu trả về
-//       if (res.data?.status === 200 && res.data?.data) {
-//         setUser(res.data.data);
-
-//         // ✅ Lưu lại thông tin user để lần sau mở app không cần gọi lại
-//         await AsyncStorage.setItem("user_info", JSON.stringify(res.data.data));
-//       } else {
-//         Alert.alert("Lỗi", "Không thể tải thông tin người dùng!");
-//       }
-//     } catch (err: any) {
-//       console.log("Lỗi khi gọi API user info:", err.response?.data || err.message);
-//       Alert.alert("Lỗi", "Không thể tải thông tin người dùng");
-//       setUser(null);
-//     }
-//   };
-
-//   fetchUser();
-// }, []);
-
-
-//   const handleGoToLogin = () => router.push('/login');
-//   const handleGoToRegister = () => router.push('/register');
-
-//   const handleLogout = async () => {
-//     try {
-//       await AsyncStorage.removeItem('access_token');
-//       await AsyncStorage.removeItem('refresh_token');
-//       Alert.alert('Thông báo', 'Bạn đã đăng xuất!');
-//       router.replace('/login');
-//     } catch (error) {
-//       console.error('Lỗi khi đăng xuất:', error);
-//       Alert.alert('Lỗi', 'Đăng xuất thất bại, thử lại sau!');
-//     }
-//   };
-
-//   return (
-//     <ThemedView style={styles.container}>
-//       <ThemedText type="title" style={styles.title}>
-//         {user ? "Thông tin người dùng" : "Chào mừng bạn!"}
-//       </ThemedText>
-
-//       {user ? (
-//         <>
-//           <View style={styles.card}>
-//             <Image
-//               source={{
-//                 uri:
-//                   user.avatar ||
-//                   "https://cdn-icons-png.flaticon.com/512/847/847969.png",
-//               }}
-//               style={styles.avatar}
-//             />
-//             <View style={styles.info}>
-//               <ThemedText style={styles.name}>{user.name}</ThemedText>
-//               <View style={styles.row}>
-//                 <Ionicons name="briefcase-outline" size={18} color="#555" />
-//                 <ThemedText style={styles.text}>
-//                   {user.departments || "Không có phòng ban"}
-//                 </ThemedText>
-//               </View>
-//             </View>
-//           </View>
-
-//           <TouchableOpacity
-//             style={[styles.button, styles.logoutButton]}
-//             onPress={handleLogout}
-//           >
-//             <ThemedText style={styles.buttonText}>Đăng xuất</ThemedText>
-//           </TouchableOpacity>
-//         </>
-//       ) : (
-//         <View style={styles.buttonRow}>
-//           <TouchableOpacity
-//             style={[styles.button, styles.loginButton]}
-//             onPress={handleGoToLogin}
-//           >
-//             <ThemedText style={styles.buttonText}>Đăng nhập</ThemedText>
-//           </TouchableOpacity>
-
-//           <TouchableOpacity
-//             style={[styles.button, styles.registerButton]}
-//             onPress={handleGoToRegister}
-//           >
-//             <ThemedText style={styles.buttonText}>Đăng ký</ThemedText>
-//           </TouchableOpacity>
-//         </View>
-//       )}
-//     </ThemedView>
-//   );
-// }
-
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     padding: 24,
-//     backgroundColor: '#fff',
-//   },
-//   title: {
-//     marginBottom: 20,
-//     fontSize: 22,
-//     fontWeight: '700',
-//   },
-//   card: {
-//     width: '100%',
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     backgroundColor: '#f9f9f9',
-//     borderRadius: 16,
-//     padding: 16,
-//     marginBottom: 30,
-//     shadowColor: '#000',
-//     shadowOpacity: 0.1,
-//     shadowRadius: 5,
-//     elevation: 3,
-//   },
-//   avatar: {
-//     width: 70,
-//     height: 70,
-//     borderRadius: 35,
-//     marginRight: 16,
-//   },
-//   info: {
-//     flex: 1,
-//   },
-//   name: {
-//     fontWeight: '700',
-//     fontSize: 18,
-//     marginBottom: 6,
-//   },
-//   row: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     marginBottom: 4,
-//   },
-//   text: {
-//     marginLeft: 6,
-//     color: '#555',
-//   },
-//   buttonRow: {
-//     flexDirection: 'row',
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     gap: 10,
-//   },
-//   button: {
-//     paddingVertical: 14,
-//     paddingHorizontal: 30,
-//     borderRadius: 12,
-//   },
-//   loginButton: {
-//     backgroundColor: '#1E90FF',
-//   },
-//   registerButton: {
-//     backgroundColor: '#ce113a',
-//   },
-//   logoutButton: {
-//     marginTop: 30,
-//     backgroundColor: '#000',
-//   },
-//   buttonText: {
-//     color: '#fff',
-//     fontWeight: '600',
-//   },
-// });
-
-
-
 import React, { useEffect, useState } from 'react';
-import { View, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { ThemedText } from '@/components/themed-text';
-import { Text, TextProps } from 'react-native';
-import { ThemedView } from '@/components/themed-view';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useRouter, useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import { Ionicons } from '@expo/vector-icons';
 
 type User = {
   id: string;
@@ -238,90 +16,108 @@ type User = {
 export default function PersonScreen() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [resourceUrl, setResourceUrl] = useState<string>(''); // luôn là string
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const token = await AsyncStorage.getItem('access_token');
-        if (!token) {
-          setLoading(false);
-          return;
-        }
+  // ✅ Load CONFIG_RESOURCE_URL
+  const loadResourceUrl = async () => {
+    try {
+      const storedResource = await AsyncStorage.getItem("resource_url");
+      if (storedResource) {
+        setResourceUrl(storedResource);
+        return storedResource;
+      }
 
-        // Kiểm tra user_info đã lưu
-        const storedUser = await AsyncStorage.getItem('user_info');
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-          setLoading(false);
-          return;
-        }
+      const publicRes = await axios.get(
+        "https://beta.api.gateway.overate-vntech.com/api/v1/settings/public",
+        { headers: { "x-svc-id": 1153 } }
+      );
 
-        // Nếu chưa có, gọi API để lấy user info
-       const userId = await AsyncStorage.getItem('user_id'); 
-       console.log(userId)
-      if (!userId) {
-        setLoading(false);
+      const url = publicRes.data?.data?.CONFIG_RESOURCE_URL ?? '';
+      if (url) {
+        await AsyncStorage.setItem("resource_url", url);
+        setResourceUrl(url);
+        return url;
+      }
+      return '';
+    } catch (err) {
+      console.log('Lỗi lấy resource URL:', err);
+      return '';
+    }
+  };
+
+  //Load user từ AsyncStorage hoặc API
+  const loadUser = async () => {
+    setLoading(true);
+    try {
+      const token = await AsyncStorage.getItem('access_token');
+      if (!token) {
+        setUser(null);
         return;
       }
+
+      const url = await loadResourceUrl();
+
+      const storedUser = await AsyncStorage.getItem("user_info");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+        return;
+      }
+
+      const userId = await AsyncStorage.getItem("user_id");
+      if (!userId) return;
 
       const res = await axios.get(
         `https://beta.api.gateway.overate-vntech.com/api/v1/users/${userId}/detail?id=${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'x-svc-id': 1153,
+            "x-svc-id": 1153,
           },
         }
       );
 
-
-        if (res.data?.status === 200 && res.data?.data) {
-          setUser(res.data.data);
-          await AsyncStorage.setItem('user_info', JSON.stringify(res.data.data));
-        }
-      } catch (err: any) {
-        console.log('Lỗi lấy thông tin user:', err.response?.data || err.message);
-      } finally {
-        setLoading(false);
+      if (res.data?.status === 200 && res.data?.data) {
+        const u: User = res.data.data;
+        setUser(u);
+        await AsyncStorage.setItem("user_info", JSON.stringify(u));
       }
-    };
-
-    loadUser();
-  }, []);
-
-  const handleLogout = async () => {
-    try {
-      await AsyncStorage.removeItem('access_token');
-      await AsyncStorage.removeItem('refresh_token');
-      await AsyncStorage.removeItem('user_info');
-      await AsyncStorage.removeItem('user_id');
-      setUser(null);
-      Toast.show({
-        type: 'success',
-        text1: 'Thông báo',
-        text2: 'Đăng xuất thành công',
-        visibilityTime: 2000
-      })
-      // Alert.alert('Thông báo', 'Bạn đã đăng xuất!');
-    } catch (error) {
-      console.log(error);
-      Toast.show({
-        type: 'error',
-        text1: 'Lỗi',
-        text2: 'Đăng xuất thất bại',
-        visibilityTime: 2000
-      })
-      // Alert.alert('Lỗi', 'Đăng xuất thất bại!');
+    } catch (err) {
+      console.log("Lỗi load user:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleGoToLogin = () => router.replace('/login');
-  // const handleGoToRegister = () => router.push('/register');
+  //Reload khi focus màn hình (sau khi update UserDetail)
+  useFocusEffect(
+    React.useCallback(() => {
+      loadUser();
+    }, [])
+  );
+
+  const avatarUrl = user?.avatar
+    ? `${resourceUrl}/${user.avatar}`
+    : "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+  const handlePress = () => {
+    if (!user?.id) return;
+    router.push({ pathname: '/userDetail', params: { id: user.id.toString() } });
+  };
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.multiRemove(["access_token", "refresh_token", "user_info", "user_id"]);
+      setUser(null);
+      Toast.show({ type: 'success', text1: 'Đăng xuất thành công' });
+    } catch (err) {
+      Toast.show({ type: 'error', text1: 'Đăng xuất thất bại' });
+    }
+  };
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" />
         <Text>Đang tải...</Text>
       </View>
     );
@@ -329,119 +125,61 @@ export default function PersonScreen() {
 
   return (
     <View style={styles.container}>
-      <ThemedText type="title" style={styles.title}>
-        {user ? 'Thông tin người dùng' : 'Chào mừng bạn!'}
-      </ThemedText>
+      <Text style={styles.title}>{user ? 'Thông tin người dùng' : 'Chào mừng bạn!'}</Text>
 
       {user ? (
         <>
-          <View style={styles.card}>
-            <Image
-              source={{ uri: user.avatar || 'https://cdn-icons-png.flaticon.com/512/847/847969.png' }}
-              style={styles.avatar}
-            />
-            <View style={styles.info}>
-              <Text style={styles.name}>{user.name}</Text>
-              <View style={styles.row}>
-                <Ionicons name="briefcase-outline" size={18} color="#555" />
-                <Text style={styles.text}>{user.departments || 'Không có phòng ban'}</Text>
+          <TouchableOpacity onPress={handlePress}>
+            <View style={styles.card}>
+              <Image source={{ uri: avatarUrl }} style={styles.avatar} />
+              <View style={styles.info}>
+                <Text style={styles.name}>{user.name}</Text>
+                <View style={styles.row}>
+                  <Ionicons name="briefcase-outline" size={18} color="#555" />
+                  <Text style={styles.text}>{user.departments || "Không có phòng ban"}</Text>
+                </View>
               </View>
             </View>
+          </TouchableOpacity>
+          <View>
+            <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={handleLogout}>
+              <Text style={styles.buttonText}>Đăng xuất</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={() => router.replace("/changePassword")}>
+              <Text style={styles.buttonText}>Đổi mật khẩu</Text>
+            </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={handleLogout}>
-            <Text style={styles.buttonText}>Đăng xuất</Text>
-          </TouchableOpacity>
+
         </>
       ) : (
-        <View style={styles.buttonRow}>
-          <TouchableOpacity style={[styles.button, styles.loginButton]} onPress={handleGoToLogin}>
-            <Text style={styles.buttonText}>Đăng nhập</Text>
-          </TouchableOpacity>
+        <TouchableOpacity style={[styles.button, styles.loginButton]} onPress={() => router.replace("/login")}>
+          <Text style={styles.buttonText}>Đăng nhập</Text>
+        </TouchableOpacity>
 
-          {/* <TouchableOpacity style={[styles.button, styles.registerButton]} onPress={handleGoToRegister}>
-            <ThemedText style={styles.buttonText}>Đăng ký</ThemedText>
-          </TouchableOpacity> */}
-        </View>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-    backgroundColor: '#fff',
-  },
-  title: {
-    marginBottom: 20,
-    fontSize: 22,
-    fontWeight: '700',
-  },
-  card: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f9f9f9',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 30,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  avatar: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    marginRight: 16,
-  },
-  info: {
-    flex: 1,
-  },
-  name: {
-    fontWeight: '700',
-    fontSize: 18,
-    marginBottom: 6,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  text: {
-    marginLeft: 6,
-    color: '#555',
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 10,
-  },
-  button: {
-    paddingVertical: 14,
-    paddingHorizontal: 30,
-    borderRadius: 12,
-  },
-  loginButton: {
-    backgroundColor: '#1E90FF',
-  },
-  registerButton: {
-    backgroundColor: '#ce113a',
-  },
-  logoutButton: {
-    marginTop: 30,
-    backgroundColor: '#000',
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: '600',
-  },
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: '#fff' },
+  loading: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  title: { fontSize: 22, fontWeight: '700', marginBottom: 20 },
+  card: { width: '100%', flexDirection: 'row', alignItems: 'center', backgroundColor: '#f9f9f9', borderRadius: 16, padding: 16, marginBottom: 30, elevation: 3 },
+  avatar: { width: 70, height: 70, borderRadius: 35, marginRight: 16 },
+  info: { flex: 1 },
+  name: { fontWeight: '700', fontSize: 18, marginBottom: 6 },
+  row: { flexDirection: 'row', alignItems: 'center' },
+  text: { marginLeft: 6, color: '#555' },
+  button: { paddingVertical: 14, paddingHorizontal: 30, borderRadius: 12 },
+  loginButton: { backgroundColor: '#1E90FF' },
+  logoutButton: { marginTop: 30, backgroundColor: '#000' },
+  buttonText: { color: '#fff', fontWeight: '600' },
 });
+
+
+
 
 

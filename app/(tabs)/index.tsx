@@ -2,11 +2,12 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { FlatList, Image, StyleSheet, TouchableOpacity, View, Alert } from "react-native";
+import { FlatList, Image, StyleSheet, TouchableOpacity, View, Alert, TextInput } from "react-native";
 import axios from "axios";
 import { useRouter } from 'expo-router';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
+
 
 type userCreated={
   id: string;
@@ -30,6 +31,7 @@ export default function NewsFeedScreen(){
     const[news, setNews] = useState<NewItem[]>([]);
     const[loading, setLoading] = useState(true);
     const router = useRouter();
+     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
     const fetchNews = async () => {
@@ -125,6 +127,18 @@ export default function NewsFeedScreen(){
     };
 
     return(
+      <>
+        <View style={styles.inputContainer}>
+          <TouchableOpacity  onPress={() => router.push('/createPost')}>
+            <TextInput
+              style={styles.input}
+              placeholder="Bạn đang nghĩ gì"
+              placeholderTextColor="#aaa"
+              autoCapitalize="none"
+              editable={false}
+            />
+          </TouchableOpacity>
+        </View>
         <ThemedView>
             <FlatList
                 data={news}
@@ -133,6 +147,8 @@ export default function NewsFeedScreen(){
                 contentContainerStyle={{}}
             />
         </ThemedView>
+      </>
+        
     );
 
 }
@@ -195,6 +211,20 @@ const styles = StyleSheet.create({
         fontSize: 13,
         marginLeft: 4,
         color: '#555'
-    }
-
+    },
+  inputContainer: {
+    backgroundColor: '#fff',
+    marginTop: 50,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  input: {
+    fontSize: 16,
+    color: '#333',
+  },
 })
