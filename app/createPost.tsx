@@ -41,7 +41,7 @@ export default function CreatePostScreen() {
                     text2: 'Vui lòng đăng nhập lại',
                     visibilityTime: 2000
                 })
-                router.replace('/login');
+                router.push('/login');
                 return;
             }
 

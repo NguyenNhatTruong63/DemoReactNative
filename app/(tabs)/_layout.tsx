@@ -17,12 +17,16 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
+        
         tabBarButton: HapticTab,
+        
       }}>
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
+          freezeOnBlur: true,
+          
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
@@ -46,6 +50,7 @@ export default function TabLayout() {
         name="person"
         options={{
           title: 'User',
+          freezeOnBlur: true,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),

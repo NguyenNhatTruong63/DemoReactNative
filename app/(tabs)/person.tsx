@@ -16,10 +16,10 @@ type User = {
 export default function PersonScreen() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  const [resourceUrl, setResourceUrl] = useState<string>(''); // luôn là string
+  const [resourceUrl, setResourceUrl] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
-  // ✅ Load CONFIG_RESOURCE_URL
+  // Load CONFIG_RESOURCE_URL
   const loadResourceUrl = async () => {
     try {
       const storedResource = await AsyncStorage.getItem("resource_url");
@@ -61,7 +61,7 @@ export default function PersonScreen() {
       const storedUser = await AsyncStorage.getItem("user_info");
       if (storedUser) {
         setUser(JSON.parse(storedUser));
-        return;
+        // return;
       }
 
       const userId = await AsyncStorage.getItem("user_id");
@@ -146,7 +146,7 @@ export default function PersonScreen() {
               <Text style={styles.buttonText}>Đăng xuất</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={() => router.replace("/changePassword")}>
+            <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={() => router.push("/changePassword")}>
               <Text style={styles.buttonText}>Đổi mật khẩu</Text>
             </TouchableOpacity>
           </View>
@@ -154,7 +154,7 @@ export default function PersonScreen() {
 
         </>
       ) : (
-        <TouchableOpacity style={[styles.button, styles.loginButton]} onPress={() => router.replace("/login")}>
+        <TouchableOpacity style={[styles.button, styles.loginButton]} onPress={() => router.push("/login")}>
           <Text style={styles.buttonText}>Đăng nhập</Text>
         </TouchableOpacity>
 

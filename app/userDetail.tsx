@@ -149,7 +149,7 @@ export default function UserDetailScreen() {
 
         Toast.show({ type: "success", text1: "Cập nhật thành công!" });
 
-        router.replace("/(tabs)/person");
+        router.push("/(tabs)/person");
       } else {
         Toast.show({ type: "error", text1: res.data.message });
       }
