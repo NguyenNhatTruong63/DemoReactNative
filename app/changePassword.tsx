@@ -6,6 +6,7 @@ import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { Ionicons } from '@expo/vector-icons';
 import base64 from 'react-native-base64';
+import { Stack } from 'expo-router';
 
 
 export default function ChangePassword() {
@@ -19,6 +20,8 @@ export default function ChangePassword() {
     const [showOldPassword, setShowOldPassword] = useState(false)
     const [showNewPassword, setShowNewPassword] = useState(false)
     const [showVerifyPassword, setShowVerifyPassword] = useState(false)
+
+    
 
     useEffect(() => {
         const getUserId = async () => {
@@ -156,6 +159,13 @@ export default function ChangePassword() {
     )
 
 }
+export const options = {
+  title: "",                 // ẩn tiêu đề
+  headerTitle: "",           // hoặc headerTitle cũng ok
+  headerBackTitleVisible: false, // ẩn chữ trên nút back
+  headerShown: true,         // vẫn hiện header để có mũi tên
+};
+
 const style = StyleSheet.create({
     container: {
         padding: 20,

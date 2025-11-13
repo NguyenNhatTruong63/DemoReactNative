@@ -45,6 +45,14 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="all"
+        options={{
+          title: 'Tất cả',
+          freezeOnBlur: true,
+          tabBarIcon: ({ color }) => <Ionicons size={28} name="apps-outline" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="person"
         options={{
           title: 'User',
