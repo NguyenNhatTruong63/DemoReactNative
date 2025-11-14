@@ -29,7 +29,7 @@ export default function EditPostScreen() {
         })();
     }, []);
 
-     useEffect(() => {
+    useEffect(() => {
     if (postData) {
       try {
         const parsed = JSON.parse(postData as string);
