@@ -5,6 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import UploadImg from '../UploadImg';
 import Toast from 'react-native-toast-message';
+import { useNavigation } from "@react-navigation/native";
+import { useLayoutEffect } from "react";
 
 export default function EditPostScreen() {
     const router = useRouter();
@@ -14,13 +16,20 @@ export default function EditPostScreen() {
 
     const [loading, setLoading] = useState(false);
 
-    const [medias, setMedias] = useState<string[]>([]);      
-    const [previewUrls, setPreviewUrls] = useState<string[]>([]); 
+    const [medias, setMedias] = useState<string[]>([]);
+    const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
     const [resource, setResource] = useState<string>('');
     const [showUpload, setShowUpload] = useState(false);
     const [imageUrls, setImageUrls] = useState<string[]>([]);
-     const { id, postData } = useLocalSearchParams();
+    const { id, postData } = useLocalSearchParams();
+    const navigation = useNavigation()
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: "Sửa bài đăng",
+        });
+    }, [navigation]);
 
     useEffect(() => {
         (async () => {
@@ -30,18 +39,18 @@ export default function EditPostScreen() {
     }, []);
 
     useEffect(() => {
-    if (postData) {
-      try {
-        const parsed = JSON.parse(postData as string);
-        setTitle(parsed.title || '');
-        setContent(parsed.content || '');
-        setMedias(parsed.medias || []);
-        console.log('Dữ liệu chỉnh sửa:', parsed);
-      } catch (e) {
-        console.error('Lỗi parse postData:', e);
-      }
-    }
-  }, [postData]);
+        if (postData) {
+            try {
+                const parsed = JSON.parse(postData as string);
+                setTitle(parsed.title || '');
+                setContent(parsed.content || '');
+                setMedias(parsed.medias || []);
+                console.log('Dữ liệu chỉnh sửa:', parsed);
+            } catch (e) {
+                console.error('Lỗi parse postData:', e);
+            }
+        }
+    }, [postData]);
 
     useEffect(() => {
         if (resource) {
@@ -51,7 +60,7 @@ export default function EditPostScreen() {
     }, [medias, resource]);
 
     const handleUpdatePost = async () => {
-        if(!title.trim()){
+        if (!title.trim()) {
             Toast.show({
                 type: 'error',
                 text1: 'Thông báo',
@@ -60,7 +69,7 @@ export default function EditPostScreen() {
             })
             return;
         }
-        if(!content.trim()){
+        if (!content.trim()) {
             Toast.show({
                 type: 'error',
                 text1: 'Thông báo',
@@ -82,7 +91,7 @@ export default function EditPostScreen() {
                 user_tags: [],
             };
             const res = await axios.post(
-                 `https://beta.api.gateway.overate-vntech.com/api/v1/kaizen/${id}/update-post`,
+                `https://beta.api.gateway.overate-vntech.com/api/v1/kaizen/${id}/update-post`,
                 payload,
                 {
                     headers: {
@@ -98,8 +107,8 @@ export default function EditPostScreen() {
                 medias: previewUrls,
             };
 
-            Toast.show({ 
-                type: 'success', 
+            Toast.show({
+                type: 'success',
                 text1: 'Thông báo',
                 text2: 'Đăng bài thành công',
                 visibilityTime: 2000
@@ -109,7 +118,7 @@ export default function EditPostScreen() {
                 params: { newPost: JSON.stringify({ title, content, medias: previewUrls }) }
             });
 
-            
+
         } catch (err) {
             console.log("POST ERROR:", err);
             Toast.show({ type: 'error', text1: 'Đăng bài thất bại' });

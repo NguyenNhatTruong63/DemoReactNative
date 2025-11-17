@@ -6,6 +6,8 @@ import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 import base64 from 'react-native-base64';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from "@react-navigation/native";
+import { useLayoutEffect } from "react";
 
 export default function CreatePasswordScreen() {
   const router = useRouter();
@@ -17,6 +19,12 @@ export default function CreatePasswordScreen() {
 
   const [token, setToken] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
+  const navigation = useNavigation()
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: "Tạo mật khẩu mới",
+    });
+  }, [navigation]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -30,24 +38,24 @@ export default function CreatePasswordScreen() {
 
   const handleCreatePassword = async () => {
     if (!newPassword.trim() || !verifyPassword.trim()) {
-      Toast.show({ 
+      Toast.show({
         type: 'error',
         text1: 'Lỗi',
         text2: 'Vui lòng nhập đầy đủ mật khẩu',
         visibilityTime: 2000
-    })
+      })
       return;
     }
     if (newPassword !== verifyPassword) {
-      Toast.show({ 
+      Toast.show({
         type: 'error',
         text1: 'Lỗi',
         text2: 'Mật khẩu không khớp',
         visibilityTime: 2000
-    })
+      })
       return;
     }
-    
+
 
     setLoading(true);
     try {
@@ -87,7 +95,7 @@ export default function CreatePasswordScreen() {
 
   return (
     <View style={style.container}>
-      <Text style={style.title}>Tạo mật khẩu mới</Text>
+      {/* <Text style={style.title}>Tạo mật khẩu mới</Text> */}
 
       {/* New Password */}
       <View style={{ marginBottom: 15 }}>
@@ -139,52 +147,52 @@ export default function CreatePasswordScreen() {
 }
 
 const style = StyleSheet.create({
-    container: {
-        padding: 20,
-        backgroundColor: '#f2f2f2',
-        flex: 1,
-    },
+  container: {
+    padding: 20,
+    backgroundColor: '#f2f2f2',
+    flex: 1,
+  },
 
-    title: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        marginBottom: 25,
-        textAlign: 'center'
-    },
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        paddingHorizontal: 10,
-        backgroundColor: '#fff',
-    },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 25,
+    textAlign: 'center'
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    backgroundColor: '#fff',
+  },
 
-    label: {
-        fontSize: 15,
-        marginBottom: 4,
-    },
+  label: {
+    fontSize: 15,
+    marginBottom: 4,
+  },
 
-    input: {
-        flex: 1,
-        paddingVertical: 10,
-        paddingHorizontal: 8,
-        borderWidth: 0,
-        backgroundColor: 'transparent',
-    },
+  input: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderWidth: 0,
+    backgroundColor: 'transparent',
+  },
 
-    button: {
-        backgroundColor: '#1E90FF',
-        paddingVertical: 14,
-        borderRadius: 12,
-        alignItems: 'center',
-        marginTop: 25,
-        marginBottom: 30,
-    },
-    buttonText: {
-        color: '#fff',
-        fontWeight: '700',
-        fontSize: 16,
-    },
+  button: {
+    backgroundColor: '#1E90FF',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 25,
+    marginBottom: 30,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
+  },
 });

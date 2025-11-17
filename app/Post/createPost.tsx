@@ -5,6 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import UploadImg from '../UploadImg';
 import Toast from 'react-native-toast-message';
+import { useNavigation } from "@react-navigation/native";
+import { useLayoutEffect } from "react";
 
 export default function CreatePostScreen() {
     const router = useRouter();
@@ -14,12 +16,19 @@ export default function CreatePostScreen() {
 
     const [loading, setLoading] = useState(false);
 
-    const [medias, setMedias] = useState<string[]>([]);      
-    const [previewUrls, setPreviewUrls] = useState<string[]>([]); 
+    const [medias, setMedias] = useState<string[]>([]);
+    const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
     const [resource, setResource] = useState<string>('');
     const [showUpload, setShowUpload] = useState(false);
     const [imageUrls, setImageUrls] = useState<string[]>([]);
+    const navigation = useNavigation()
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: "Đăng bài",
+        });
+    }, [navigation]);
 
     useEffect(() => {
         (async () => {
@@ -36,7 +45,7 @@ export default function CreatePostScreen() {
     }, [medias, resource]);
 
     const handlePost = async () => {
-        if(!title.trim()){
+        if (!title.trim()) {
             Toast.show({
                 type: 'error',
                 text1: 'Thông báo',
@@ -45,7 +54,7 @@ export default function CreatePostScreen() {
             })
             return;
         }
-        if(!content.trim()){
+        if (!content.trim()) {
             Toast.show({
                 type: 'error',
                 text1: 'Thông báo',
@@ -83,8 +92,8 @@ export default function CreatePostScreen() {
                 medias: previewUrls,
             };
 
-            Toast.show({ 
-                type: 'success', 
+            Toast.show({
+                type: 'success',
                 text1: 'Thông báo',
                 text2: 'Đăng bài thành công',
                 visibilityTime: 2000

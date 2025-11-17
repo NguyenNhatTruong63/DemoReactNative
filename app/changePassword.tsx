@@ -7,6 +7,8 @@ import Toast from 'react-native-toast-message';
 import { Ionicons } from '@expo/vector-icons';
 import base64 from 'react-native-base64';
 import { Stack } from 'expo-router';
+import { useNavigation } from "@react-navigation/native";
+import { useLayoutEffect } from "react";
 
 
 export default function ChangePassword() {
@@ -20,8 +22,15 @@ export default function ChangePassword() {
     const [showOldPassword, setShowOldPassword] = useState(false)
     const [showNewPassword, setShowNewPassword] = useState(false)
     const [showVerifyPassword, setShowVerifyPassword] = useState(false)
+    const navigation = useNavigation()
 
-    
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: "Đổi mật khẩu",
+        });
+    }, [navigation]);
+
+
 
     useEffect(() => {
         const getUserId = async () => {
@@ -75,7 +84,7 @@ export default function ChangePassword() {
                 },
                 {
                     headers: {
-                        'x-svc-id': 1153,         
+                        'x-svc-id': 1153,
                         Authorization: `Bearer ${token}`,
                     },
                 }
@@ -100,7 +109,7 @@ export default function ChangePassword() {
 
     return (
         <View style={style.container}>
-            <Text style={style.title}>Đổi mật khẩu</Text>
+            {/* <Text style={style.title}>Đổi mật khẩu</Text> */}
 
             <View style={{ marginBottom: 15 }}>
                 <Text style={style.label}>Mật khẩu cũ </Text>
@@ -159,12 +168,6 @@ export default function ChangePassword() {
     )
 
 }
-export const options = {
-  title: "",                 // ẩn tiêu đề
-  headerTitle: "",           // hoặc headerTitle cũng ok
-  headerBackTitleVisible: false, // ẩn chữ trên nút back
-  headerShown: true,         // vẫn hiện header để có mũi tên
-};
 
 const style = StyleSheet.create({
     container: {

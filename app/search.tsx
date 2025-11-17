@@ -6,6 +6,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import NewsFeedImages from "./NewsFeedImages";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { useLayoutEffect } from "react";
 
 type userCreated = {
   id: string;
@@ -28,6 +30,12 @@ export default function SearchScreen() {
   const [news, setNews] = useState<NewItem[]>([]);
   const [filteredNews, setFilteredNews] = useState<NewItem[]>([]);
   const [resourceUrl, setResourceUrl] = useState<string>("");
+  const navigation = useNavigation()
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: "Tìm kiếm",
+    });
+  }, [navigation]);
 
   // Load resource URL
   const loadResourceUrl = async () => {

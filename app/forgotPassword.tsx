@@ -9,11 +9,18 @@ import { Text } from '@react-navigation/elements';
 import { Alert, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import base64 from 'react-native-base64';
 import Toast from 'react-native-toast-message';
+import { useLayoutEffect } from "react";
 
 export default function ForgotPassword() {
     const [username, setUsername] = useState('')
     const [forgotPassword, setForgotPassword] = useState()
     const [loading, setLoading] = useState(false)
+    const navigation = useNavigation()
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: "Quên mật khẩu",
+        });
+    }, [navigation]);
 
     // const handleSendOTP = async () => {
     //     if (!username) {
@@ -68,8 +75,8 @@ export default function ForgotPassword() {
 
 
     // }
-    const handleNext =() =>{
-        if(!username.trim){
+    const handleNext = () => {
+        if (!username.trim) {
             Toast.show({
                 type: 'error',
                 text1: 'Lỗi',
@@ -80,12 +87,12 @@ export default function ForgotPassword() {
         }
         router.push({
             pathname: '/otpForgotPassword',
-            params: {username}
+            params: { username }
         })
     }
     return (
         <View style={style.container}>
-            <Text style={style.title}>Quên mật khẩu</Text>
+            {/* <Text style={style.title}>Quên mật khẩu</Text> */}
             <View >
                 <Text style={style.label}>Tên đăng nhập</Text>
                 <View style={style.inputContainer}>

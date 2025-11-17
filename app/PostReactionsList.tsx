@@ -5,11 +5,19 @@ import axios from "axios";
 import Toast from "react-native-toast-message";
 import { useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { useLayoutEffect } from "react";
 
 export default function PostReactionsList({ onClose }: { onClose?: () => void }) {
   const { postId } = useLocalSearchParams();
   const [loading, setLoading] = useState(true);
   const [reactions, setReactions] = useState<any[]>([]);
+   const navigation = useNavigation()
+     useLayoutEffect(() => {
+    navigation.setOptions({
+      title: "Danh sách", 
+    });
+  }, [navigation]);
 
   const fetchReactions = async () => {
     setLoading(true);

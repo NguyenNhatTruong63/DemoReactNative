@@ -6,13 +6,21 @@ import axios from 'axios';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
+import { useNavigation } from "@react-navigation/native";
+import { useLayoutEffect } from "react";
 
 export default function OtpForgotPasswordScreen() {
   const [otp, setOtp] = useState('');
   const router = useRouter();
   // const { username } = useLocalSearchParams();
-   const { username: rawUsername } = useLocalSearchParams();
+  const { username: rawUsername } = useLocalSearchParams();
   const username = Array.isArray(rawUsername) ? rawUsername[0] : rawUsername;
+  const navigation = useNavigation()
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: "OTP Quên mật khẩu",
+    });
+  }, [navigation]);
 
   const handleVerifyOtpForgotPassword = async () => {
     if (!otp) {
