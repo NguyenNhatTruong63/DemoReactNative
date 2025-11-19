@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, Image, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -7,15 +7,25 @@ import { useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useLayoutEffect } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import 'dayjs/locale/vi';
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
+dayjs.extend(relativeTime);
+dayjs.locale('vi');
+dayjs.extend(customParseFormat);
 
 export default function PostReactionsList({ onClose }: { onClose?: () => void }) {
   const { postId } = useLocalSearchParams();
   const [loading, setLoading] = useState(true);
   const [reactions, setReactions] = useState<any[]>([]);
-   const navigation = useNavigation()
-     useLayoutEffect(() => {
+  const navigation = useNavigation()
+  useLayoutEffect(() => {
     navigation.setOptions({
-      title: "Danh sách", 
+      title: "Danh sách",
     });
   }, [navigation]);
 
@@ -52,9 +62,15 @@ export default function PostReactionsList({ onClose }: { onClose?: () => void })
     }
   };
 
-  useEffect(() => {
-    fetchReactions();
-  }, [postId]);
+  // useEffect(() => {
+  //   fetchReactions();
+  // }, [postId]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchReactions();
+    }, [postId])
+  );
 
   if (loading) return (
     <View style={styles.center}>
@@ -121,6 +137,9 @@ export default function PostReactionsList({ onClose }: { onClose?: () => void })
                 <Text style={styles.name}>{name}</Text>
                 {/* <Text style={styles.reaction}>{reactionType.toString()}</Text> */}
                 {renderReactionIcon(reactionType)}
+                <Text>
+                  {dayjs(item.created_at, "DD/MM/YYYY HH:mm:ss", true).fromNow()}
+                </Text>
               </View>
             </View>
           );

@@ -97,7 +97,7 @@ export default function CreatePasswordScreen() {
     <View style={style.container}>
       {/* <Text style={style.title}>Tạo mật khẩu mới</Text> */}
 
-      {/* New Password */}
+
       <View style={{ marginBottom: 15 }}>
         <Text style={style.label}>Mật khẩu mới</Text>
         <View style={style.inputContainer}>

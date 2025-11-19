@@ -12,7 +12,13 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useNavigation } from "@react-navigation/native";
 import { useLayoutEffect } from "react";
 
+import 'dayjs/locale/vi';
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
 dayjs.extend(relativeTime);
+dayjs.locale('vi');
+dayjs.extend(customParseFormat);
+
 
 type CommentType = {
   id: number | string;
@@ -23,6 +29,7 @@ type CommentType = {
     avatar?: string;
   };
   created_at?: string;
+  updated_at?: string;
 };
 
 export default function CommentScreen() {
@@ -38,13 +45,13 @@ export default function CommentScreen() {
 
   const [resourceUrl, setResourceUrl] = useState("");
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-   const navigation = useNavigation()
+  const navigation = useNavigation()
 
-     useLayoutEffect(() => {
-       navigation.setOptions({
-         title: "Danh sách bình luận", 
-       });
-     }, [navigation]);
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: "Danh sách bình luận",
+    });
+  }, [navigation]);
 
   // Lấy thông tin user hiện tại
   useFocusEffect(
@@ -234,8 +241,13 @@ export default function CommentScreen() {
                 </Text>
                 <Text style={{ marginTop: 4 }}>{item.content}</Text>
                 <Text style={{ color: "#666", fontSize: 12 }}>
-                  {item.created_at ? dayjs(item.created_at).fromNow() : ""}
+                  {item.updated_at
+                    ? `${dayjs(item.updated_at, "DD/MM/YYYY HH:mm", true).fromNow()}`
+                    : item.created_at
+                      ? `${dayjs(item.created_at, "DD/MM/YYYY HH:mm", true).fromNow()}`
+                      : ""}
                 </Text>
+
               </View>
 
               {canEdit && (

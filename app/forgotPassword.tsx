@@ -22,59 +22,7 @@ export default function ForgotPassword() {
         });
     }, [navigation]);
 
-    // const handleSendOTP = async () => {
-    //     if (!username) {
-    //         Toast.show({
-    //             type: 'error',
-    //             text1: 'Lỗi',
-    //             text2: 'Vui lòng nhập tên đăng nhập',
-    //             visibilityTime: 2000
-    //         })
-    //         return
-    //     }
-    //     try {
-    //         const res = await axios.post(
-    //             'https://beta.api.gateway.overate-vntech.com/api/v1/auth/verify-otp-forgot-password',
-    //             {
-    //                 username
 
-    //             },
-    //             // {
-    //             //     headers: {
-    //             //         'x-svc-id': 1153,
-    //             //         // Authorization: `Bearer ${token}`,
-    //             //     },
-    //             // }
-    //         )
-    //         if (res.data?.status === 200) {
-    //             Toast.show({
-    //                 type: 'success',
-    //                 text1: 'Thành công',
-    //                 text2: 'OTP đã được gửi',
-    //             });
-
-    //             router.push({
-    //                 pathname: '/createPassword',
-    //                 params: { username },
-    //             });
-    //         } else {
-    //             Toast.show({
-    //                 type: 'error',
-    //                 text1: 'Thất bại',
-    //                 text2: res.data?.message || 'Gửi OTP thất bại',
-    //             });
-    //         }
-    //     } catch (err: any) {
-    //         Toast.show({
-    //             type: 'error',
-    //             text1: 'Lỗi',
-    //             text2: err.response?.data?.message || 'Không thể gửi OTP',
-    //         });
-    //     }
-
-
-
-    // }
     const handleNext = () => {
         if (!username.trim) {
             Toast.show({

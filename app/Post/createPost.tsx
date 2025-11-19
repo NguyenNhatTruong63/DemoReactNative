@@ -102,22 +102,6 @@ export default function CreatePostScreen() {
                 pathname: '/',
                 params: { newPost: JSON.stringify({ title, content, medias: previewUrls }) }
             });
-
-            // router.push({
-            //     pathname: '/',
-            //     params: { newPost: JSON.stringify(newPost) }
-            // }); 
-            // router.push({
-            //     pathname: '/',
-            //     params: {
-            //         newPost: JSON.stringify({
-            //             id: 'temp-id',
-            //             title,
-            //             content,
-            //             medias: previewUrls,
-            //         })
-            //     }
-            // });
         } catch (err) {
             console.log("POST ERROR:", err);
             Toast.show({ type: 'error', text1: 'Đăng bài thất bại' });
