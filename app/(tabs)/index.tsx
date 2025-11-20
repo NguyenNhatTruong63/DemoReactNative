@@ -43,7 +43,7 @@ type NewItem = {
 type MediaItem = {
   url: string;
   type: number;
-  name: string;
+  // name: string;
 };
 
 export enum KAIZEN_POST_TYPE {
@@ -121,7 +121,7 @@ export default function NewsFeedScreen() {
 
       const list = res.data?.data?.list || [];
 
-      // Merge cached likes to keep numbers after reload
+
       const cached = await AsyncStorage.getItem("cached_news");
       const cachedNews: NewItem[] = cached ? JSON.parse(cached) : [];
 
@@ -282,6 +282,7 @@ export default function NewsFeedScreen() {
         return null;
       })
       .filter(Boolean) as string[];
+      
 
 
   const renderItem = ({ item }: { item: NewItem }) => {
@@ -354,11 +355,14 @@ export default function NewsFeedScreen() {
         <NewsFeedImages
           // medias={medias}
           medias={getSafeMediaUrls(item.medias, resourceUrl)}
+           resourceUrl={resourceUrl}       
           onPressImage={(uri) => {
             setSelectedImage(uri);
             setModalVisible(true);
           }}
         />
+  
+
         {/* <Image source={item.medias} />? */}
         {/* <View style={{ flexDirection: 'row' }}>
           {item.medias.map((mediaItem, index) => (

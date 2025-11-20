@@ -134,7 +134,7 @@ export default function TwoFASettings() {
   useEffect(() => {
     fetch2FAStatus();
   }, []);
-
+  
   if (loading && is2FAEnabled === null) {
     return (
       <View style={styles.container}>

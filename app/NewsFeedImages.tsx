@@ -1,12 +1,14 @@
 
 import React, { useState } from "react";
-import {View,TouchableOpacity,Modal,FlatList,Pressable,Text,StyleSheet,Dimensions} from "react-native";
-import ImageWithFallback from "./ImageWithFallback"; 
+import { View, TouchableOpacity, Modal, FlatList, Pressable, Text, StyleSheet, Dimensions } from "react-native";
+import ImageWithFallback from "./ImageWithFallback";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 const gap = 4;
-const resourceBase = "https://beta.api.gateway.overate-vntech.com";
+// const resourceBase = "https://beta.api.gateway.overate-vntech.com";
+const resourceBase = "https://beta.resource.overate-vntech.com";
+
 
 type MediaItem = {
   url: string;
@@ -15,6 +17,7 @@ type MediaItem = {
 
 type Props = {
   medias: (string | MediaItem)[];
+  resourceUrl: string;
   onPressImage?: (uri: string) => void;
 };
 
@@ -30,6 +33,10 @@ export default function NewsFeedImages({ medias, onPressImage }: Props) {
       if (typeof m === "object" && m.url) {
         return m.url.startsWith("http") ? m.url : `${resourceBase}${m.url}`;
       }
+      if (typeof m === "object" && m.url) {
+        return `${resourceBase}${m.url}`;
+      }
+
 
       return null;
     })
