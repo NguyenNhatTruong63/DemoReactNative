@@ -146,6 +146,7 @@ export default function PersonScreen() {
     { id: "1", label: "Đổi mật khẩu", onPress: () => router.push("/changePassword") },
     { id: "2", label: "Đăng xuất", onPress: handleLogout },
     { id: "3", label: "Xác thực 2 yếu tố", onPress: () => router.push("/fa_2") },
+    { id: "4", label: "Chấm công", onPress: () => router.push("/attendanceDetail") },
   ];
 
   if (loading) {

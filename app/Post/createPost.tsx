@@ -110,6 +110,7 @@ export default function CreatePostScreen() {
         }
     };
 
+
     return (
         <View style={styles.container}>
             <Text style={styles.label}>Tiêu đề</Text>
