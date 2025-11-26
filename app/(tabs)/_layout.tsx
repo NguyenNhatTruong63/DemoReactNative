@@ -18,7 +18,7 @@ export default function TabLayout() {
     const checkToken = async () => {
       const token = await AsyncStorage.getItem('access_token');
       if (!token) {
-        router.replace('/login');
+        router.replace('/profile/Login');
       }
       setIsLoading(false);
     };
@@ -42,14 +42,6 @@ export default function TabLayout() {
           title: 'Home',
           freezeOnBlur: true,
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="all"
-        options={{
-          title: 'Tất cả',
-          freezeOnBlur: true,
-          tabBarIcon: ({ color }) => <Ionicons size={28} name="apps-outline" color={color} />,
         }}
       />
       <Tabs.Screen

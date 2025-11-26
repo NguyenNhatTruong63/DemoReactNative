@@ -4,7 +4,6 @@ import { View, Text, FlatList, TextInput, TouchableOpacity, ActivityIndicator, M
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
 import Toast from "react-native-toast-message";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -14,6 +13,10 @@ import { useLayoutEffect } from "react";
 
 import 'dayjs/locale/vi';
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { createComment, deleteComment, detailComment, editComment } from "../api/comment";
+import { getPublicSettings } from "../api/auth";
+import {UpdateCommentPayload} from "../api/comment"
+import { ToastHelper } from "@/components/toast/ToastShow";
 
 dayjs.extend(relativeTime);
 dayjs.locale('vi');
@@ -74,11 +77,8 @@ export default function CommentScreen() {
         setResourceUrl(stored);
         return;
       }
+      const res = await getPublicSettings()
 
-      const res = await axios.get(
-        "https://beta.api.gateway.overate-vntech.com/api/v1/settings/public",
-        { headers: { "x-svc-id": 1153 } }
-      );
 
       const url = res.data?.data?.CONFIG_RESOURCE_URL ?? "";
       if (url) {
@@ -95,20 +95,14 @@ export default function CommentScreen() {
       setLoading(true);
       const token = await AsyncStorage.getItem("access_token");
       if (!token) throw new Error("Chưa đăng nhập");
-
-      const res = await axios.get(
-        "https://beta.api.gateway.overate-vntech.com/api/v1/kaizen/comments",
-        {
-          params: { post_id: postId },
-          headers: { Authorization: `Bearer ${token}`, "x-svc-id": 1153 },
-        }
-      );
+      const res = await detailComment(postId);
 
       if (res.data?.status === 200) {
         setComments(res.data.data?.list || []);
       }
     } catch (err: any) {
-      Toast.show({ type: "error", text1: "Lỗi", text2: "Không thể tải bình luận" });
+      ToastHelper.error('Không thể tải bình luận')
+      // Toast.show({ type: "error", text1: "Lỗi", text2: "Không thể tải bình luận" });
     } finally {
       setLoading(false);
     }
@@ -121,12 +115,15 @@ export default function CommentScreen() {
     try {
       const token = await AsyncStorage.getItem("access_token");
       if (!token) throw new Error("Chưa đăng nhập");
+      const playload = {
+        post_id: postId,
+        content,
+        user_tags: [],
+        medias: []
 
-      const res = await axios.post(
-        "https://beta.api.gateway.overate-vntech.com/api/v1/kaizen/create-comment",
-        { post_id: postId, content, user_tags: [], medias: [] },
-        { headers: { Authorization: `Bearer ${token}`, "x-svc-id": 1153 } }
-      );
+      };
+
+      const res = await createComment(playload);
 
       if (res.data?.status === 200) {
         setCommentText("");
@@ -134,7 +131,8 @@ export default function CommentScreen() {
         Toast.show({ type: "success", text1: "Đã gửi bình luận" });
       }
     } catch (err: any) {
-      Toast.show({ type: "error", text1: "Lỗi", text2: "Không thể gửi bình luận" });
+      ToastHelper.error('Không thể gửi bình luận')
+      // Toast.show({ type: "error", text1: "Lỗi", text2: "Không thể gửi bình luận" });
     }
   };
 
@@ -150,24 +148,29 @@ export default function CommentScreen() {
       if (!comment) return;
 
       if (comment.user_comment?.id.toString() !== currentUserId) {
-        Toast.show({ type: "error", text1: "Thông báo", text2: "Bạn không thể sửa bình luận này" });
+        ToastHelper.error('Bạn không thể sửa bình luận này')
+        // Toast.show({ type: "error", text1: "Thông báo", text2: "Bạn không thể sửa bình luận này" });
         return;
       }
-
-      const res = await axios.post(
-        "https://beta.api.gateway.overate-vntech.com/api/v1/kaizen/update-comment",
-        { post_id: postId, comment_id: commentId, content, user_tags: [], medias: [] },
-        { headers: { Authorization: `Bearer ${token}`, "x-svc-id": 1153 } }
-      );
+      const payload: UpdateCommentPayload = {
+        post_id: postId.toString(),
+        comment_id: commentId.toString(), 
+        content,
+        user_tags: [],
+        medias: []
+      };
+      const res = await editComment(payload)
 
       if (res.data?.status === 200) {
         setEditingComment(null);
         setCommentText("");
         fetchComments();
-        Toast.show({ type: "success", text1: "Đã cập nhật bình luận" });
+        ToastHelper.success('Đã cập nhật bình luận')
+        // Toast.show({ type: "success", text1: "Đã cập nhật bình luận" });
       }
     } catch (err: any) {
-      Toast.show({ type: "error", text1: "Lỗi", text2: "Không thể cập nhật bình luận" });
+      ToastHelper.error('Không thể cập nhật bình luận')
+      // Toast.show({ type: "error", text1: "Lỗi", text2: "Không thể cập nhật bình luận" });
     }
   };
 
@@ -181,22 +184,21 @@ export default function CommentScreen() {
       if (!comment) return;
 
       if (comment.user_comment?.id.toString() !== currentUserId) {
-        Toast.show({ type: "error", text1: "Thông báo", text2: "Bạn không thể xóa bình luận này" });
+        ToastHelper.error('Bạn không thể xóa bình luận này ')
+        // Toast.show({ type: "error", text1: "Thông báo", text2: "Bạn không thể xóa bình luận này" });
         return;
       }
+      const res = await deleteComment(commentId)
 
-      const res = await axios.post(
-        "https://beta.api.gateway.overate-vntech.com/api/v1/kaizen/remove-comment",
-        { comment_id: commentId },
-        { headers: { Authorization: `Bearer ${token}`, "x-svc-id": 1153 } }
-      );
 
       if (res.data?.status === 200) {
         setComments(prev => prev.filter(c => c.id.toString() !== commentId));
-        Toast.show({ type: "success", text1: "Đã xóa bình luận" });
+        ToastHelper.success('Đã xóa bình luận này')
+        // Toast.show({ type: "success", text1: "Đã xóa bình luận" });
       }
     } catch (err: any) {
-      Toast.show({ type: "error", text1: "Lỗi", text2: "Không thể xóa bình luận" });
+      ToastHelper.error('Không thể xóa bình luận')
+      // Toast.show({ type: "error", text1: "Lỗi", text2: "Không thể xóa bình luận" });
     }
   };
 

@@ -1,19 +1,21 @@
 
+import PostMenu from "@/app/post/Post-Menu";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useState, useCallback } from "react";
-import { FlatList, Image, StyleSheet, TouchableOpacity, View, TextInput, Text, Modal } from "react-native";
-import axios from "axios";
-import { useRouter } from 'expo-router';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Toast from "react-native-toast-message";
-import NewsFeedImages from "../NewsFeedImages";
 import { useFocusEffect } from '@react-navigation/native';
-import PostMenu from "@/app/Post/PostMenu";
-import { useLocalSearchParams } from "expo-router";
+import axios from "axios";
 import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
 import 'dayjs/locale/vi';
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useState } from "react";
+import { FlatList, Image, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import Toast from "react-native-toast-message";
+import NewsFeedImages from "../news-feed-images/News-Feed-Images";
+import { getPublicSettings } from "../api/auth";
+import { detailComment } from "../api/comment";
+import { newFees, reactionsPost2 } from "../api/post";
 
 dayjs.extend(relativeTime);
 dayjs.locale('vi');
@@ -36,14 +38,12 @@ type NewItem = {
   content: string;
   likes?: number;
   comments?: number;
-  // medias?: string[];
   medias: MediaItem[];
   liked?: boolean;
 };
 type MediaItem = {
   url: string;
   type: number;
-  // name: string;
 };
 
 export enum KAIZEN_POST_TYPE {
@@ -85,12 +85,7 @@ export default function NewsFeedScreen() {
     try {
       const storedResource = await AsyncStorage.getItem('resource_url');
       if (storedResource) return setResourceUrl(storedResource);
-
-      const publicRes = await axios.get(
-        'https://beta.api.gateway.overate-vntech.com/api/v1/settings/public',
-        { headers: { 'x-svc-id': 1153 } }
-      );
-
+      const publicRes = await getPublicSettings()
       const url = publicRes.data?.data?.CONFIG_RESOURCE_URL ?? '';
       if (url) await AsyncStorage.setItem('resource_url', url);
       setResourceUrl(url);
@@ -110,14 +105,8 @@ export default function NewsFeedScreen() {
       if (!token) return;
 
       await loadResourceUrl();
+      const res = await newFees(KAIZEN_POST_TYPE.ALL);
 
-      const res = await axios.get(
-        "https://beta.api.gateway.overate-vntech.com/api/v1/kaizen/news-feed",
-        {
-          params: { type, page: 1, limit: 50 },
-          headers: { Authorization: `Bearer ${token}`, "x-svc-id": 1153 },
-        }
-      );
 
       const list = res.data?.data?.list || [];
 
@@ -137,13 +126,8 @@ export default function NewsFeedScreen() {
       });
       const updatedNews = await Promise.all(
         mergedNews.map(async (item: any) => {
-          const res = await axios.get(
-            "https://beta.api.gateway.overate-vntech.com/api/v1/kaizen/comments",
-            {
-              params: { post_id: item.id },
-              headers: { Authorization: `Bearer ${token}`, "x-svc-id": 1153 },
-            }
-          );
+          const res = await detailComment(item.id);
+      
           const count = res.data?.data?.list?.length ?? 0;
           return { ...item, comments: count };
         })
@@ -201,20 +185,20 @@ export default function NewsFeedScreen() {
       if (!post) throw new Error("Bài viết không tồn tại");
 
       const alreadyLiked = post.liked ?? false;
+
       const reaction_type = alreadyLiked ? 1 : 2;
 
-      const res = await axios.post(
-        "https://beta.api.gateway.overate-vntech.com/api/v1/kaizen/reactions/posts",
-        { post_id: postId, reaction_type },
-        { headers: { Authorization: `Bearer ${token}`, "x-svc-id": 1153 } }
-      );
+      const res = await reactionsPost2(postId, reaction_type);
 
       if (res.data?.status === 200) {
-        const updatedLikes = res.data?.data?.likes ?? (alreadyLiked ? post.likes! - 1 : post.likes! + 1);
-        //  const updatedLikes = res.data?.data?.likes ?? post.likes ?? 0;
+        const updatedLikes =
+          res.data?.data?.likes ??
+          (alreadyLiked ? post.likes! - 1 : post.likes! + 1);
 
         const updatedNews = news.map(item =>
-          Number(item.id) === postId ? { ...item, liked: !alreadyLiked, likes: updatedLikes } : item
+          Number(item.id) === postId
+            ? { ...item, liked: !alreadyLiked, likes: updatedLikes }
+            : item
         );
 
         setNews(updatedNews);
@@ -237,6 +221,7 @@ export default function NewsFeedScreen() {
       });
     }
   };
+
   const fetchCommentCounts = async () => {
     try {
       const token = await AsyncStorage.getItem("access_token");
@@ -244,13 +229,8 @@ export default function NewsFeedScreen() {
 
       const updatedNews = await Promise.all(
         news.map(async (item) => {
-          const res = await axios.get(
-            "https://beta.api.gateway.overate-vntech.com/api/v1/kaizen/comments",
-            {
-              params: { post_id: item.id },
-              headers: { Authorization: `Bearer ${token}`, "x-svc-id": 1153 },
-            }
-          );
+          const res = await detailComment(item.id)
+      
           const count = res.data?.data?.list?.length ?? 0;
           return { ...item, comments: count };
         })
@@ -282,16 +262,14 @@ export default function NewsFeedScreen() {
         return null;
       })
       .filter(Boolean) as string[];
-      
+
 
 
   const renderItem = ({ item }: { item: NewItem }) => {
     const avatarUrl = item.user_created.avatar
       ? `${resourceUrl}/${item.user_created.avatar}`
       : 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
-    // console.log("RESOURCE URL:", resourceUrl);
-    // console.log("MEDIAS RAW:", item.medias);
-    // console.log("MEDIAS FINAL:", getSafeMediaUrls(item.medias, resourceUrl));
+
     const medias = item.medias
 
 
@@ -301,11 +279,7 @@ export default function NewsFeedScreen() {
           <Image source={{ uri: avatarUrl }} style={styles.avatar} resizeMode="cover" />
           <View style={{ flex: 1, marginLeft: 10 }}>
             <Text style={styles.userName}>{item.user_created.name}</Text>
-            {/* <Text style={styles.time}>{item.created_at}</Text> */}
-            {/* <Text style={styles.time}>{dayjs(item.created_at).fromNow()}</Text> */}
-            {/* <Text style={styles.time}>
-              {dayjs(item.created_at, "DD/MM/YYYY HH:mm", true).fromNow()}
-            </Text> */}
+     
             <Text style={styles.time}>
               {item.updated_at
                 ? `${dayjs(item.updated_at, "DD/MM/YYYY HH:mm", true).fromNow()}`
@@ -317,7 +291,6 @@ export default function NewsFeedScreen() {
 
 
           </View>
-          {/* <PostMenu postId={Number(item.id)} onPostDeleted={() => fetchNews(currentType)} /> */}
           {currentUserId === item.user_created.id && (
             <PostMenu postId={Number(item.id)} onPostDeleted={() => fetchNews(currentType)} />
           )}
@@ -326,53 +299,17 @@ export default function NewsFeedScreen() {
         <Text style={styles.userName}>{item.title}</Text>
         <Text style={styles.content}>{item.content}</Text>
 
-        {/* <NewsFeedImages
-          medias={item.medias?.map(uri => `${resourceUrl}/${uri}`) || []}
-          onPressImage={(uri) => { setSelectedImage(uri); setModalVisible(true); }}
-        /> */}
-
-        {/* <NewsFeedImages
-          medias={item.medias?.map(m => `${resourceUrl}${m.url}`) || []}
-          onPressImage={(uri) => {
-            setSelectedImage(uri);
-            setModalVisible(true);
-          }}
-        /> */}
-
-        {/* <NewsFeedImages
-          medias={
-            item.medias
-              ?.filter(m => m?.url)                 // ⬅️ Lọc bỏ phần tử lỗi
-              .map(m => `${resourceUrl}${m.url}`)   // Mapping an toàn
-            || []
-          }
-          onPressImage={(uri) => {
-            setSelectedImage(uri);
-            setModalVisible(true);
-          }}
-        /> */}
 
         <NewsFeedImages
           // medias={medias}
           medias={getSafeMediaUrls(item.medias, resourceUrl)}
-           resourceUrl={resourceUrl}       
+          resourceUrl={resourceUrl}
           onPressImage={(uri) => {
             setSelectedImage(uri);
             setModalVisible(true);
           }}
         />
-  
 
-        {/* <Image source={item.medias} />? */}
-        {/* <View style={{ flexDirection: 'row' }}>
-          {item.medias.map((mediaItem, index) => (
-            <Image
-              key={index} // Cần có key khi dùng map
-              source={{ uri: mediaItem.url }} // Lấy URI của từng ảnh
-              style={{ width: 50, height: 50, margin: 5 }}
-            />
-          ))}
-        </View> */}
 
 
         <Modal visible={modalVisible} transparent onRequestClose={() => setModalVisible(false)}>
@@ -388,7 +325,7 @@ export default function NewsFeedScreen() {
             <Text style={styles.actionText}>{item.likes}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton} onPress={() => router.push(`../Comment/CommentScreen?postId=${item.id}`)}>
+          <TouchableOpacity style={styles.actionButton} onPress={() => router.push(`../comment/CommentScreen?postId=${item.id}`)}>
             <Ionicons name="chatbubble-outline" size={20} color="#555" />
             <Text style={styles.actionText}>{item.comments ?? 0}</Text>
 
@@ -398,12 +335,11 @@ export default function NewsFeedScreen() {
             style={{ width: 200, height: 30 }}
             onPress={() =>
               router.push({
-                pathname: "/PostReactionsList",
+                pathname: "/reactions/Post-Reactions-List",
                 params: { postId: String(item.id) },
               })
             }
           >
-            {/* <Text>Xem danh sách</Text> */}
           </TouchableOpacity>
         </View>
       </View>
@@ -413,7 +349,7 @@ export default function NewsFeedScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
-        <TouchableOpacity style={{ flex: 1, marginRight: 10 }} onPress={() => router.push('/Post/createPost')}>
+        <TouchableOpacity style={{ flex: 1, marginRight: 10 }} onPress={() => router.push('/post/Create-Post')}>
           <TextInput
             style={styles.input}
             placeholder="Bạn đang nghĩ gì"
@@ -427,7 +363,7 @@ export default function NewsFeedScreen() {
           <Text style={{ fontSize: 12 }}>Thông báo</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => router.push('/search')}>
+        <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => router.push('/Search')}>
           <Ionicons name="search-outline" size={24} color="#333" />
           <Text style={{ fontSize: 12 }}>Tìm kiếm</Text>
         </TouchableOpacity>

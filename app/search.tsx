@@ -1,13 +1,12 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import React, { useEffect, useState } from "react";
-import { View, TextInput, FlatList, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
-import NewsFeedImages from "./NewsFeedImages";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import { useLayoutEffect } from "react";
+import axios from "axios";
+import React, { useEffect, useLayoutEffect, useState } from "react";
+import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import NewsFeedImages from "./news-feed-images/News-Feed-Images";
 
 type userCreated = {
   id: string;
@@ -106,9 +105,9 @@ export default function SearchScreen() {
 
         <ThemedText style={styles.title}>{item.title}</ThemedText>
         <ThemedText style={styles.content}>{item.content}</ThemedText>
-        <View style={styles.imgs}>
+        {/* <View style={styles.imgs}>
           <NewsFeedImages medias={item.medias?.map(uri => `${resourceUrl}/${uri}`) || []} />
-        </View>
+        </View> */}
         <View>
           <View style={styles.acctionRow}>
             <TouchableOpacity style={styles.actionButton}>

@@ -5,8 +5,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import { Ionicons } from '@expo/vector-icons';
-import axios from 'axios';
-import { useLocalSearchParams } from "expo-router";
+import { getPublicSettings, userDetail } from '../api/auth';
 
 type User = {
   id: string;
@@ -30,13 +29,11 @@ export default function PersonScreen() {
         setResourceUrl(storedResource);
         return storedResource;
       }
-
-      const publicRes = await axios.get(
-        'https://beta.api.gateway.overate-vntech.com/api/v1/settings/public',
-        { headers: { 'x-svc-id': 1153 } }
-      );
+      
+      const publicRes = await getPublicSettings()
 
       const url = publicRes.data?.data?.CONFIG_RESOURCE_URL ?? '';
+
       if (url) {
         await AsyncStorage.setItem('resource_url', url);
         setResourceUrl(url);
@@ -73,16 +70,12 @@ export default function PersonScreen() {
       if (!token || !userId) {
         console.log('Không tìm thấy token hoặc user_id');
         setLoading(false)
-        // Toast.show({ type: 'error', text1: 'Không tìm thấy thông tin đăng nhập' });
         return;
       }
 
       await loadResourceUrl();
+      const res = await userDetail(userId)
 
-      const res = await axios.get(
-        `https://beta.api.gateway.overate-vntech.com/api/v1/users/${userId}/detail?id=${userId}`,
-        { headers: { Authorization: `Bearer ${token}`, "x-svc-id": 1153 } }
-      );
       console.log("API RESPONSE:", res.data);
 
       const d = res?.data?.data;
@@ -90,10 +83,8 @@ export default function PersonScreen() {
       if (!d || !d.id) {
         console.log('User data null hoặc thiếu id:', d);
       
-        // Toast.show({ type: 'error', text1: 'Không tải được thông tin người dùng' });
         return;
       }
-      // console.log(" Set user from API:", d);
 
       setUser({
         id: d.id.toString(),
@@ -129,7 +120,7 @@ export default function PersonScreen() {
 
   const handlePress = () => {
     if (!user?.id) return;
-    router.push("/userDetail")
+    router.push("/profile/User-Detail")
   };
 
   const handleLogout = async () => {
@@ -143,10 +134,10 @@ export default function PersonScreen() {
   };
 
   const settingsOptions = [
-    { id: "1", label: "Đổi mật khẩu", onPress: () => router.push("/changePassword") },
+    { id: "1", label: "Đổi mật khẩu", onPress: () => router.push("/profile/Change-Password") },
     { id: "2", label: "Đăng xuất", onPress: handleLogout },
-    { id: "3", label: "Xác thực 2 yếu tố", onPress: () => router.push("/fa_2") },
-    { id: "4", label: "Chấm công", onPress: () => router.push("/attendanceDetail") },
+    { id: "3", label: "Xác thực 2 yếu tố", onPress: () => router.push("/profile/TwoFASettings") },
+    { id: "4", label: "Chấm công", onPress: () => router.push("/timekeeping/Attendance-Detail") },
   ];
 
   if (loading) {
@@ -207,7 +198,7 @@ export default function PersonScreen() {
           />
         </>
       ) : !loading ? (
-        <TouchableOpacity style={[styles.button, styles.loginButton]} onPress={() => router.push('/login')}>
+        <TouchableOpacity style={[styles.button, styles.loginButton]} onPress={() => router.push('/profile/Login')}>
           <Text style={styles.buttonText}>Đăng nhập</Text>
         </TouchableOpacity>
       ) : null}
