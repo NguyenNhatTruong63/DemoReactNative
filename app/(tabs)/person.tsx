@@ -5,7 +5,8 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import { Ionicons } from '@expo/vector-icons';
-import { getPublicSettings, userDetail } from '../api/auth';
+import { getPublicSettings } from '@/api/public-settings';
+import { apiGetUserDetail } from '@/api/auth/getUserDetail';
 
 type User = {
   id: string;
@@ -74,7 +75,7 @@ export default function PersonScreen() {
       }
 
       await loadResourceUrl();
-      const res = await userDetail(userId)
+      const res = await apiGetUserDetail(userId)
 
       console.log("API RESPONSE:", res.data);
 
@@ -120,7 +121,7 @@ export default function PersonScreen() {
 
   const handlePress = () => {
     if (!user?.id) return;
-    router.push("/profile/User-Detail")
+    router.push("/auth/userDetail")
   };
 
   const handleLogout = async () => {
@@ -134,10 +135,10 @@ export default function PersonScreen() {
   };
 
   const settingsOptions = [
-    { id: "1", label: "Đổi mật khẩu", onPress: () => router.push("/profile/Change-Password") },
+    { id: "1", label: "Đổi mật khẩu", onPress: () => router.push("/auth/changePassword") },
     { id: "2", label: "Đăng xuất", onPress: handleLogout },
-    { id: "3", label: "Xác thực 2 yếu tố", onPress: () => router.push("/profile/TwoFASettings") },
-    { id: "4", label: "Chấm công", onPress: () => router.push("/timekeeping/Attendance-Detail") },
+    { id: "3", label: "Xác thực 2 yếu tố", onPress: () => router.push("/auth/twoFaSettings") },
+    { id: "4", label: "Chấm công", onPress: () => router.push("/timekeeping/attendanceDetail") },
   ];
 
   if (loading) {
@@ -198,7 +199,7 @@ export default function PersonScreen() {
           />
         </>
       ) : !loading ? (
-        <TouchableOpacity style={[styles.button, styles.loginButton]} onPress={() => router.push('/profile/Login')}>
+        <TouchableOpacity style={[styles.button, styles.loginButton]} onPress={() => router.push('/auth/login')}>
           <Text style={styles.buttonText}>Đăng nhập</Text>
         </TouchableOpacity>
       ) : null}

@@ -1,5 +1,9 @@
 
-import PostMenu from "@/app/post/Post-Menu";
+import { apiGetDetailComment } from "@/api/postNewsFeed/getDetailComment";
+import { apiGetNewFeed } from "@/api/postNewsFeed/getNewsFeed";
+import { apiPostReactionsPost2 } from "@/api/postNewsFeed/postReactionsPost";
+import { getPublicSettings } from "@/api/public-settings";
+import PostMenu from "@/app/post/postMenu";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from '@react-navigation/native';
@@ -12,10 +16,9 @@ import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, Image, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
-import NewsFeedImages from "../news-feed-images/News-Feed-Images";
-import { getPublicSettings } from "../api/auth";
-import { detailComment } from "../api/comment";
-import { newFees, reactionsPost2 } from "../api/post";
+import NewsFeedImages from "../../components/news-feed-images/News-Feed-Images";
+import { KAIZEN_POST_TYPE } from "@/api/postNewsFeed/type";
+
 
 dayjs.extend(relativeTime);
 dayjs.locale('vi');
@@ -46,11 +49,6 @@ type MediaItem = {
   type: number;
 };
 
-export enum KAIZEN_POST_TYPE {
-  ALL = -1,
-  NORMAL = 1,
-  KAIZEN = 2,
-}
 
 export default function NewsFeedScreen() {
   const [news, setNews] = useState<NewItem[]>([]);
@@ -105,7 +103,7 @@ export default function NewsFeedScreen() {
       if (!token) return;
 
       await loadResourceUrl();
-      const res = await newFees(KAIZEN_POST_TYPE.ALL);
+      const res = await apiGetNewFeed(type);
 
 
       const list = res.data?.data?.list || [];
@@ -126,7 +124,7 @@ export default function NewsFeedScreen() {
       });
       const updatedNews = await Promise.all(
         mergedNews.map(async (item: any) => {
-          const res = await detailComment(item.id);
+          const res = await apiGetDetailComment(item.id);
       
           const count = res.data?.data?.list?.length ?? 0;
           return { ...item, comments: count };
@@ -188,7 +186,7 @@ export default function NewsFeedScreen() {
 
       const reaction_type = alreadyLiked ? 1 : 2;
 
-      const res = await reactionsPost2(postId, reaction_type);
+      const res = await apiPostReactionsPost2(postId, reaction_type);
 
       if (res.data?.status === 200) {
         const updatedLikes =
@@ -229,7 +227,7 @@ export default function NewsFeedScreen() {
 
       const updatedNews = await Promise.all(
         news.map(async (item) => {
-          const res = await detailComment(item.id)
+          const res = await apiGetDetailComment(item.id)
       
           const count = res.data?.data?.list?.length ?? 0;
           return { ...item, comments: count };
@@ -325,7 +323,7 @@ export default function NewsFeedScreen() {
             <Text style={styles.actionText}>{item.likes}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton} onPress={() => router.push(`../comment/CommentScreen?postId=${item.id}`)}>
+          <TouchableOpacity style={styles.actionButton} onPress={() => router.push(`../post/commentPost?postId=${item.id}`)}>
             <Ionicons name="chatbubble-outline" size={20} color="#555" />
             <Text style={styles.actionText}>{item.comments ?? 0}</Text>
 
@@ -335,7 +333,7 @@ export default function NewsFeedScreen() {
             style={{ width: 200, height: 30 }}
             onPress={() =>
               router.push({
-                pathname: "/reactions/Post-Reactions-List",
+                pathname: "/post/postReactionsList",
                 params: { postId: String(item.id) },
               })
             }
@@ -349,7 +347,7 @@ export default function NewsFeedScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
-        <TouchableOpacity style={{ flex: 1, marginRight: 10 }} onPress={() => router.push('/post/Create-Post')}>
+        <TouchableOpacity style={{ flex: 1, marginRight: 10 }} onPress={() => router.push('/post/createPost')}>
           <TextInput
             style={styles.input}
             placeholder="Bạn đang nghĩ gì"

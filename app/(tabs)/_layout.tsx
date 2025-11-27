@@ -18,7 +18,7 @@ export default function TabLayout() {
     const checkToken = async () => {
       const token = await AsyncStorage.getItem('access_token');
       if (!token) {
-        router.replace('/profile/Login');
+        router.replace('/auth/login');
       }
       setIsLoading(false);
     };

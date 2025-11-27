@@ -6,7 +6,6 @@ import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import NewsFeedImages from "./news-feed-images/News-Feed-Images";
 
 type userCreated = {
   id: string;
